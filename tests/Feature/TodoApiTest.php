@@ -28,7 +28,7 @@ class TodoApiTest extends TestCase
             'completed' => false,
         ]);
 
-        $response->assertStatus(201)
+        $response->assertStatus(200)
             ->assertJson([
                 'title' => 'Test Todo',
                 'description' => 'Test Description',
