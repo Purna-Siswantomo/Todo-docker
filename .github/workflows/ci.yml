@@ -1,0 +1,58 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo, pdo_sqlite, mbstring, xml, gd, bcmath
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Prepare environment file
+        run: cp .env.example .env
+
+      - name: Prepare SQLite database
+        run: touch database/database.sqlite
+
+      - name: Generate application key
+        run: php artisan key:generate --force
+
+      - name: Run database migrations
+        run: php artisan migrate --force
+
+      - name: Run automated tests
+        run: php artisan test
+
+      - name: Build Docker image
+        run: docker build -t todo-app:latest .
+
+      - name: Run Docker container health check
+        run: |
+          docker run -d --name test-container -p 9000:8000 todo-app:latest
+          sleep 10
+          curl -f http://localhost:9000/api/health || (docker logs test-container && exit 1)
+          docker stop test-container
+          docker rm test-container
