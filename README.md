@@ -8,12 +8,12 @@ Aplikasi ini adalah sistem manajemen tugas (Todo List) sederhana dengan fitur:
 - Membuat, membaca, memperbarui, dan menghapus todo (CRUD)
 - RESTful API untuk manajemen todo
 - Health check endpoint untuk monitoring
-- SQLite database untuk penyimpanan data
+- MariaDB/MySQL container untuk penyimpanan data runtime, SQLite untuk testing lokal
 
 ## 🛠️ Teknologi yang Digunakan
 
-- **PHP 8.3** dengan **Laravel 11**
-- **SQLite** sebagai database
+- **PHP 8.3** dengan **Laravel 13.8**
+- **MariaDB/MySQL** sebagai database runtime, **SQLite** untuk testing lokal
 - **Docker** untuk containerization
 - **Docker Compose** untuk orchestration
 - **GitHub Actions** untuk CI/CD pipeline
@@ -102,15 +102,18 @@ php artisan test
 
 ### Dockerfile
 - Base image: `php:8.3-cli-alpine`
-- Install PHP extensions: pdo, pdo_sqlite, mbstring, xml, gd, bcmath
+- Install PHP extensions: `pdo`, `pdo_sqlite`, `pdo_mysql`, `mbstring`, `xml`, `gd`, `bcmath`
 - Copy source code dan install dependencies
-- Generate app key dan run migrations
+- Generate app key
 - Expose port 8000
+- Jalankan `docker/entrypoint.sh` untuk menunggu database lalu menjalankan migrasi saat container start
 
 ### Docker Compose
-- Service: `app`
+- Service: `app` dan `db`
 - Port mapping: `8080:8000`
-- Volume untuk persistence storage
+- Volume `db_data` untuk persistence database
+- Network `todo-network`
+- `depends_on` untuk memastikan database siap sebelum app start
 - Health check via `/api/health` endpoint
 - Restart policy: `unless-stopped`
 
@@ -122,10 +125,11 @@ Workflow `.github/workflows/ci.yml` melakukan:
 3. **Cache** Composer packages
 4. **Install dependencies** dengan Composer
 5. **Generate** application key
-6. **Run migrations** database
+6. **Run migrations** database SQLite untuk test lokal di CI
 7. **Run automated tests** (PHPUnit)
 8. **Build Docker image**
-9. **Run container** dan verifikasi health check
+9. **Menjalankan stack multi-container** dengan Docker Compose
+10. **Verifikasi health check** dan endpoint yang terhubung ke database
 
 ### Trigger Pipeline
 - Push ke branch `main`
@@ -138,6 +142,26 @@ Workflow `.github/workflows/ci.yml` melakukan:
 4. Perbaiki kesalahan
 5. Commit dan push kembali
 6. Lihat pipeline berhasil
+
+## K. Format Pengumpulan
+
+- Nama/NIM/Kelas: Purna Siswantomo / C2C023160 / [Kelas Anda]
+- Nama/NIM/Kelas: Erifa Dwi Astuti / C2C023161 / [Kelas Anda]
+- Nama aplikasi: Todo List Application
+- Link repository GitHub: https://github.com/Purna-Siswantomo/Todo-docker.git
+- Link pipeline gagal: https://github.com/Purna-Siswantomo/Todo-docker/actions/runs/28741426116
+- Link pipeline berhasil: https://github.com/Purna-Siswantomo/Todo-docker/actions/runs/28741450472
+- Link video demonstrasi: [belum tersedia]
+- Link image registry (opsional): [belum tersedia]
+- Link aplikasi online (opsional): [belum tersedia]
+
+### Bukti UAS yang perlu disertakan
+- Link workflow GitHub Actions yang gagal
+- Link workflow GitHub Actions yang berhasil
+- Screenshot `docker compose ps`
+- Bukti data tetap ada setelah `docker compose down` lalu `docker compose up -d`
+- Bukti `php artisan test` berjalan minimal 3 test
+- Bukti health check dan simulasi restart atau stop container
 
 ## 📡 API Endpoints
 

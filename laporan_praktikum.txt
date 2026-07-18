@@ -1,0 +1,262 @@
+LAPORAN PRAKTIKUM TERINTEGRASI
+Integrasi Docker, Container Orchestration, dan CI/CD pada Komputer Pribadi
+
+Nama            : [Isi Nama]
+NIM             : [Isi NIM]
+Kelas           : [Isi Kelas]
+Mata Kuliah     : Komputasi Awan (Cloud Computing)
+Tahun Akademik  : 2025/2026
+Nama Aplikasi   : Todo App Laravel
+
+============================================================
+BAB 1. PENDAHULUAN
+============================================================
+
+1.1 Latar Belakang
+Perkembangan aplikasi modern menuntut proses pengembangan yang lebih terstruktur, konsisten, dan mudah diotomatisasi. Docker membantu memastikan aplikasi dapat berjalan dengan lingkungan yang sama di setiap mesin, sehingga mengurangi perbedaan konfigurasi antara laptop pengembang, container lokal, dan lingkungan pengujian. Docker Compose digunakan untuk mengelola service secara deklaratif, sehingga beberapa komponen aplikasi dapat dijalankan bersama dengan konfigurasi yang terpusat. Sementara itu, CI/CD melalui GitHub Actions berguna untuk menjalankan pengujian otomatis dan build image secara berulang setiap kali ada perubahan kode.
+
+1.2 Tujuan
+Tujuan praktikum ini adalah membuktikan bahwa aplikasi sederhana dapat:
+1. Dibangun sebagai Docker image.
+2. Dijalankan di dalam container.
+3. Dikelola menggunakan Docker Compose.
+4. Diuji secara otomatis melalui test case.
+5. Diintegrasikan dengan pipeline GitHub Actions.
+6. Menunjukkan pipeline gagal dan pipeline berhasil sebagai quality gate.
+
+1.3 Hubungan Docker, Orkestrasi, dan CI/CD
+Docker digunakan untuk containerization aplikasi. Docker Compose berperan sebagai bentuk orkestrasi sederhana pada skala lokal untuk mengatur service, port, restart policy, dan healthcheck. CI/CD berfungsi mengotomatisasi testing dan build agar perubahan kode dapat divalidasi sebelum dipakai lebih lanjut. Ketiga teknologi ini saling melengkapi: Docker menyiapkan lingkungan, Docker Compose mengelola service, dan CI/CD memastikan kualitas perubahan kode.
+
+============================================================
+BAB 2. DESKRIPSI APLIKASI
+============================================================
+
+2.1 Nama Aplikasi
+Todo App Laravel.
+
+2.2 Fungsi Aplikasi
+Aplikasi ini adalah sistem todo list sederhana yang menyediakan fitur:
+1. Menampilkan daftar todo.
+2. Menambah todo baru.
+3. Mengubah status todo menjadi selesai atau belum selesai.
+4. Menghapus todo.
+5. Menyediakan endpoint health check untuk memastikan service berjalan.
+
+2.3 Teknologi yang Digunakan
+1. PHP 8.3
+2. Laravel
+3. SQLite
+4. Docker
+5. Docker Compose
+6. GitHub Actions
+7. PHPUnit
+
+2.4 Struktur Folder
+Struktur folder utama pada project adalah sebagai berikut:
+1. `app/` untuk controller, model, dan command.
+2. `bootstrap/` untuk inisialisasi aplikasi Laravel.
+3. `config/` untuk konfigurasi aplikasi.
+4. `database/` untuk migration, factory, dan seeder.
+5. `public/` sebagai folder publik aplikasi.
+6. `resources/` untuk view, CSS, dan JavaScript.
+7. `routes/` untuk routing web, API, dan console.
+8. `tests/` untuk automated testing.
+9. `.github/workflows/` untuk workflow GitHub Actions.
+10. `Dockerfile` untuk build image.
+11. `docker-compose.yml` untuk definisi service.
+
+============================================================
+BAB 3. IMPLEMENTASI DOCKER
+============================================================
+
+3.1 Instalasi dan Verifikasi Docker
+Docker diverifikasi dengan perintah berikut:
+1. `docker --version`
+2. `docker compose version`
+3. `docker run hello-world`
+
+Hasil verifikasi menunjukkan Docker terinstal dan Docker Compose tersedia pada komputer pribadi.
+
+3.2 Dockerfile
+Dockerfile pada project menggunakan base image `php:8.3-cli-alpine`. Di dalamnya dilakukan langkah-langkah:
+1. Install dependency sistem yang dibutuhkan.
+2. Install ekstensi PHP seperti `pdo`, `pdo_sqlite`, `mbstring`, `gd`, `xml`, `bcmath`, dan lainnya.
+3. Menyalin Composer dari image resmi Composer.
+4. Menetapkan working directory.
+5. Menyalin source code aplikasi.
+6. Menyalin `.env.example` menjadi `.env`.
+7. Install dependency Laravel dengan Composer.
+8. Generate application key.
+9. Menyiapkan file SQLite.
+10. Menjalankan migration database.
+11. Menjalankan aplikasi dengan `php artisan serve`.
+
+3.3 Build Image
+Image dibangun dengan perintah:
+`docker build -t todo-app:test .`
+
+Hasil build berhasil dan image dapat dilihat melalui:
+`docker images`
+
+3.4 Run Container
+Container dijalankan melalui Docker Compose dan dipetakan ke port lokal. Aplikasi dapat diakses melalui browser pada:
+`http://localhost:8080`
+
+Endpoint health check juga dapat diakses pada:
+`http://localhost:8080/api/health`
+
+============================================================
+BAB 4. IMPLEMENTASI DOCKER COMPOSE
+============================================================
+
+4.1 Isi Docker Compose
+File `docker-compose.yml` mendefinisikan satu service utama bernama `app`. Konfigurasi penting yang digunakan:
+1. `build: .` untuk membangun image dari Dockerfile.
+2. `container_name: todo-app`.
+3. Port mapping `8080:8000`.
+4. Volume untuk storage dan bootstrap cache.
+5. Environment SQLite.
+6. `restart: unless-stopped`.
+7. Healthcheck ke endpoint `/api/health`.
+
+4.2 Service yang Digunakan
+Pada implementasi ini digunakan satu service utama, yaitu service aplikasi Laravel. Service database tidak dipisahkan karena aplikasi memakai SQLite agar lebih sederhana dan sesuai dengan skala tugas.
+
+4.3 Hasil `docker compose ps`
+Setelah dijalankan dengan:
+`docker compose up -d --build`
+
+status service dapat dicek dengan:
+`docker compose ps`
+
+Hasil yang ditampilkan menunjukkan container `todo-app` dalam kondisi `Up` dan `healthy`.
+
+============================================================
+BAB 5. IMPLEMENTASI CI/CD
+============================================================
+
+5.1 Automated Test
+Project memiliki automated test di folder `tests/Feature/TodoApiTest.php`. Test yang tersedia mencakup:
+1. Menampilkan daftar todo.
+2. Membuat todo baru.
+3. Melihat detail todo.
+4. Mengubah todo.
+5. Menghapus todo.
+6. Validasi field `title` wajib diisi.
+
+Test dijalankan dengan perintah:
+`php artisan test`
+
+Hasil pengujian lokal menunjukkan seluruh test berhasil.
+
+5.2 Workflow GitHub Actions
+Workflow CI berada pada file `.github/workflows/ci.yml`. Alur pipeline yang digunakan:
+1. Checkout source code.
+2. Setup PHP 8.3.
+3. Install dependency Composer.
+4. Menyiapkan file `.env`.
+5. Menyiapkan database SQLite.
+6. Generate application key.
+7. Menjalankan migration.
+8. Menjalankan automated test.
+9. Build Docker image.
+10. Menjalankan container dan memeriksa endpoint health check.
+
+5.3 Pipeline Gagal
+Pipeline gagal dibuat secara terkontrol dengan mengubah assertion pada test sehingga ekspektasi tidak sesuai dengan output aplikasi. Setelah commit dan push, GitHub Actions menampilkan status gagal dan log error menunjukkan perbedaan status code yang diharapkan dengan hasil yang diterima.
+
+Link workflow gagal:
+[isi link GitHub Actions gagal]
+
+5.4 Pipeline Berhasil
+Setelah kesalahan diperbaiki, commit dan push dilakukan kembali. GitHub Actions kemudian menampilkan status berhasil karena test lolos dan Docker build berhasil.
+
+Link workflow berhasil:
+[isi link GitHub Actions berhasil]
+
+============================================================
+BAB 6. KESIMPULAN
+============================================================
+
+6.1 Hasil
+Praktikum ini berhasil menunjukkan alur lengkap dari aplikasi lokal menuju container, orkestrasi lokal dengan Docker Compose, automated testing, dan pipeline CI/CD.
+
+6.2 Kendala
+Beberapa kendala yang ditemukan selama pengerjaan antara lain:
+1. Perbedaan port antara container dan workflow.
+2. Endpoint health check yang perlu disesuaikan.
+3. Kebutuhan file SQLite saat build image.
+4. Perlunya riwayat commit yang bertahap sesuai ketentuan tugas.
+
+6.3 Solusi
+Kendala tersebut diselesaikan dengan:
+1. Menyamakan port aplikasi pada Dockerfile, Compose, dan workflow.
+2. Memperbaiki endpoint health check menjadi `/api/health`.
+3. Menyiapkan file database SQLite sebelum migration.
+4. Membuat commit bertahap sesuai proses pengerjaan.
+
+6.4 Manfaat Otomatisasi
+Automatisasi membantu memastikan aplikasi tetap konsisten, mudah diuji, dan lebih aman saat ada perubahan kode. Dengan Docker, Docker Compose, dan GitHub Actions, proses build dan validasi aplikasi menjadi lebih terukur.
+
+============================================================
+PENUNJANG LAPORAN
+============================================================
+
+Link Repository GitHub:
+https://github.com/Purna-Siswantomo/Todo-docker
+
+Link Pipeline Gagal:
+[isi link GitHub Actions gagal]
+
+Link Pipeline Berhasil:
+[isi link GitHub Actions berhasil]
+
+Link Video Demonstrasi:
+[isi link video]
+
+Link Aplikasi Online:
+[opsional / tidak ada]
+
+============================================================
+PLACEHOLDER BUKTI WAJIB
+============================================================
+
+SS No. 1 - Docker terinstal
+Cara verifikasi: `docker --version`
+[tempel screenshot di sini]
+
+SS No. 2 - Docker Compose tersedia
+Cara verifikasi: `docker compose version`
+[tempel screenshot di sini]
+
+SS No. 3 - Hello World berjalan
+Cara verifikasi: `docker run hello-world`
+[tempel screenshot di sini]
+
+SS No. 4 - Docker image berhasil dibuat
+Cara verifikasi: `docker images`
+[tempel screenshot di sini]
+
+SS No. 5 - Container berjalan
+Cara verifikasi: `docker ps`
+[tempel screenshot di sini]
+
+SS No. 6 - Aplikasi dapat diakses
+Cara verifikasi: Browser, curl, atau API client
+[tempel screenshot di sini]
+
+SS No. 7 - Compose berjalan
+Cara verifikasi: `docker compose ps`
+[tempel screenshot di sini]
+
+SS No. 8 - Repository GitHub
+Cara verifikasi: Link aktif dan riwayat commit
+[tempel screenshot di sini]
+
+SS No. 9 - Pipeline gagal
+Cara verifikasi: Link GitHub Actions dan log error
+[tempel screenshot di sini]
+
+SS No. 10 - Pipeline berhasil
+Cara verifikasi: Link GitHub Actions dan log test/build
+[tempel screenshot di sini]

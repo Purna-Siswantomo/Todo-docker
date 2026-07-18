@@ -11,12 +11,14 @@ RUN apk add --no-cache \
     sqlite-dev \
     oniguruma-dev \
     linux-headers \
+    mariadb-client \
     $PHPIZE_DEPS
 
 # Install PHP extensions
 RUN docker-php-ext-install \
     pdo \
     pdo_sqlite \
+    pdo_mysql \
     mbstring \
     exif \
     pcntl \
@@ -42,14 +44,11 @@ RUN composer install --optimize-autoloader --no-interaction
 # Generate application key
 RUN php artisan key:generate --force
 
-# Prepare SQLite database file for container build
-RUN touch database/database.sqlite
-
-# Run migrations
-RUN php artisan migrate --force
+# Copy the runtime entrypoint
+COPY docker/entrypoint.sh /var/www/docker/entrypoint.sh
 
 # Expose port 8000 for PHP built-in server
 EXPOSE 8000
 
-# Start PHP built-in server
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Start the app after ensuring the database is reachable
+CMD ["sh", "/var/www/docker/entrypoint.sh"]
