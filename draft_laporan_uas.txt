@@ -1,0 +1,64 @@
+DAFTAR ISI DRAFT LAPORAN UAS
+
+BAB 1 PENDAHULUAN
+Pada era cloud computing, kebutuhan akan aplikasi yang mudah dijalankan, dipindahkan, dan dikelola menjadi semakin penting. Docker hadir sebagai solusi untuk mengemas aplikasi beserta seluruh dependensinya ke dalam image yang konsisten, sehingga aplikasi dapat dijalankan pada lingkungan yang sama tanpa bergantung pada konfigurasi manual di setiap mesin. Pada proyek ini, saya mengembangkan aplikasi Todo List sederhana berbasis Laravel yang dijalankan menggunakan Docker dan Docker Compose untuk menunjukkan penerapan konsep cloud computing secara utuh, mulai dari containerisasi, orkestrasi, persistent storage, health check, automated testing, hingga pipeline CI/CD.
+
+Tujuan utama dari proyek ini adalah membangun aplikasi multi-container yang terdiri dari container aplikasi dan container database, lalu mengelolanya dengan Docker Compose agar mudah dijalankan dan dipelihara. Selain itu, proyek ini juga bertujuan untuk membuktikan bahwa data dapat dipertahankan melalui volume, layanan dapat dipantau melalui health check, dan kualitas aplikasi dapat dijaga melalui automated testing serta GitHub Actions. Dengan pendekatan ini, aplikasi tidak hanya berfungsi secara lokal, tetapi juga memiliki struktur deployment yang lebih mendekati praktik cloud computing yang sesungguhnya.
+
+Manfaat dari penerapan Docker pada proyek ini adalah konsistensi environment, kemudahan deployment, dan kemudahan pemeliharaan. Aplikasi dapat dijalankan ulang tanpa konfigurasi yang rumit, sementara database tetap aman karena datanya disimpan pada volume terpisah. GitHub Actions juga membantu memastikan bahwa setiap perubahan kode yang masuk tetap melalui pengujian dan build otomatis sebelum dinyatakan layak. Dengan demikian, proyek ini menjadi implementasi sederhana namun lengkap dari konsep cloud computing, terutama pada aspek containerization dan continuous integration.
+
+BAB 2 ANALISIS DAN ARSITEKTUR
+Aplikasi yang dikembangkan pada proyek ini adalah Todo List sederhana yang digunakan untuk mengelola data tugas. Pengguna dapat melihat daftar todo, menambahkan todo baru, melihat detail todo, memperbarui status atau isi todo, serta menghapus todo yang sudah tidak diperlukan. Aplikasi ini juga memiliki endpoint health check untuk memastikan koneksi aplikasi ke database masih berjalan dengan baik. Walaupun fitur aplikasi sederhana, fokus utamanya adalah pada cara aplikasi tersebut dibangun dan dijalankan di dalam arsitektur container yang rapi dan terpisah.
+
+Arsitektur aplikasi terdiri dari dua container utama, yaitu container aplikasi Laravel dan container database MariaDB. Pengguna mengakses aplikasi melalui browser atau API request ke container aplikasi, lalu aplikasi memproses permintaan tersebut dan berinteraksi dengan database di container terpisah. Docker Compose digunakan untuk mengatur kedua service ini secara deklaratif, termasuk pengaturan port, network, restart policy, depends_on, dan health check. Struktur ini menunjukkan hubungan antara aplikasi, image, container, network, dan volume dalam lingkungan cloud computing.
+
+Pada implementasinya, container aplikasi menjalankan Laravel dan menyediakan endpoint REST API, sedangkan container database menyimpan seluruh data todo secara persisten. Volume digunakan untuk menjaga data database agar tidak hilang saat container dihentikan atau dibuat ulang. Network internal memungkinkan container aplikasi mengenali database melalui nama service, yaitu `db`, tanpa perlu menggunakan IP statis. GitHub Actions digunakan sebagai pipeline CI/CD untuk menjalankan testing dan build secara otomatis. Dengan desain ini, seluruh komponen saling terhubung dan membentuk sistem yang mudah dikelola serta lebih mendekati praktik deployment modern.
+
+BAB 3 IMPLEMENTASI APLIKASI
+Aplikasi Todo List ini dibangun menggunakan Laravel dengan pola REST API. Fitur utama aplikasi mencakup operasi CRUD, yaitu menampilkan data todo, menambahkan todo, mengubah todo, dan menghapus todo. Pada proses pembuatan dan pembaruan data, aplikasi melakukan validasi untuk memastikan field penting seperti title tidak kosong. Data todo disimpan pada tabel `todos` yang berisi kolom id, title, description, completed, created_at, dan updated_at. Struktur ini cukup untuk merepresentasikan kebutuhan dasar aplikasi pengelolaan tugas.
+
+Implementasi aplikasi dipisahkan menjadi beberapa komponen inti, yaitu model, controller, route, dan migration. Model `Todo` digunakan untuk mendefinisikan atribut yang dapat diisi dan mengatur cast untuk field completed agar bernilai boolean. Controller `TodoController` menangani logika CRUD dan mengembalikan response JSON. Route API didefinisikan pada file `routes/api.php`, termasuk endpoint `/api/health` untuk pemeriksaan status layanan. Dengan struktur ini, aplikasi menjadi lebih mudah dipahami dan dipelihara karena setiap tanggung jawab dipisahkan dengan jelas.
+
+Konfigurasi environment juga menjadi bagian penting dalam implementasi aplikasi. File `.env.example` disediakan sebagai template konfigurasi agar credential tidak ditulis langsung ke repository. Pada runtime, aplikasi menggunakan variabel environment untuk menentukan koneksi database, host, port, nama database, username, dan password. Dengan pendekatan ini, aplikasi dapat dijalankan di lingkungan berbeda tanpa perlu mengubah source code. Implementasi ini menunjukkan praktik dasar yang baik dalam pengelolaan konfigurasi aplikasi berbasis cloud.
+
+BAB 4 IMPLEMENTASI CONTAINER
+Containerisasi pada proyek ini dibangun menggunakan Dockerfile yang berfungsi membentuk image aplikasi Laravel. Dockerfile menggunakan base image `php:8.3-cli-alpine`, kemudian menginstal dependency sistem dan ekstensi PHP yang dibutuhkan, termasuk `pdo_mysql` agar aplikasi dapat terhubung ke MariaDB. Source code aplikasi disalin ke dalam image, kemudian Composer dijalankan untuk menginstal dependency PHP. Setelah itu, image menjalankan entrypoint script ketika container start, sehingga migrasi database dapat dijalankan saat database sudah siap.
+
+Docker Compose digunakan untuk menjalankan dua service utama, yaitu `app` dan `db`. Service `db` menggunakan image MariaDB dan menyimpan data pada volume bernama `db_data`, sedangkan service `app` membangun image Laravel dari Dockerfile yang disediakan. Docker Compose juga mengatur port mapping agar aplikasi dapat diakses melalui port 8080 pada host, sementara container tetap berjalan pada port internal 8000. Penggunaan `depends_on` memastikan container aplikasi baru dijalankan setelah database berada dalam status healthy.
+
+Health check diterapkan pada kedua service untuk memantau kondisi layanan. Pada service aplikasi, endpoint `/api/health` digunakan untuk memastikan aplikasi masih dapat merespons dan terhubung ke database. Pada service database, health check memastikan MariaDB dapat menerima koneksi dan query sederhana. Restart policy `unless-stopped` juga diterapkan agar container dapat berjalan kembali secara otomatis jika terjadi gangguan. Dengan kombinasi Dockerfile, Docker Compose, volume, network, dan health check, proyek ini memenuhi konsep dasar multi-container orchestration.
+
+BAB 5 IMPLEMENTASI CI/CD
+Continuous Integration dan Continuous Delivery diterapkan melalui GitHub Actions. Workflow pada repository ini dirancang untuk menjalankan beberapa tahap penting secara otomatis setiap kali ada push atau pull request ke branch utama. Tahap tersebut meliputi checkout source code, setup PHP, instalasi dependency, pembuatan file environment, pembuatan application key, migrasi database untuk testing lokal, menjalankan automated testing, build Docker image, menjalankan stack Docker Compose, dan memverifikasi health check aplikasi. Proses ini memastikan bahwa perubahan kode selalu melewati quality gate sebelum dianggap valid.
+
+Automated testing menjadi bagian penting dalam pipeline karena berfungsi memverifikasi bahwa fitur utama aplikasi tetap berjalan setelah ada perubahan. Pada proyek ini tersedia lebih dari tiga pengujian otomatis yang mencakup listing todo, pembuatan todo, melihat detail todo, mengubah todo, menghapus todo, dan validasi input. Selain itu, workflow juga digunakan untuk membangun Docker image agar dapat dipastikan image yang dihasilkan siap dijalankan. Dengan adanya pipeline ini, proses validasi tidak lagi dilakukan secara manual sepenuhnya, melainkan dibantu oleh otomasi yang lebih konsisten dan cepat.
+
+Dalam proyek ini juga dilakukan simulasi pipeline gagal dan pipeline berhasil sebagai bukti bahwa CI/CD benar-benar digunakan sebagai quality gate. Pipeline gagal dibuat secara terkontrol melalui perubahan yang menyebabkan test tidak lulus, kemudian diperbaiki hingga pipeline kembali berhasil. Bukti ini penting karena menunjukkan bahwa workflow bukan hanya ada di file konfigurasi, tetapi juga benar-benar diuji dalam proses pengembangan. Dengan demikian, GitHub Actions berperan sebagai mekanisme otomatis untuk menjaga kualitas kode dan build Docker image.
+
+BAB 6 PENGUJIAN
+Pengujian dilakukan untuk memastikan bahwa aplikasi, container, volume, dan pipeline bekerja sesuai kebutuhan. Pengujian fungsional menunjukkan bahwa aplikasi dapat menampilkan data todo, menambahkan todo baru, memperbarui data, menghapus data, dan memvalidasi input dengan benar. Pengujian API melalui endpoint `/api/todos` dan `/api/health` juga membuktikan bahwa aplikasi dapat diakses dengan baik dari host melalui port yang sudah dipetakan. Hasil pengujian ini menunjukkan bahwa fungsi dasar aplikasi berjalan sesuai rancangan.
+
+Pengujian automated testing dilakukan menggunakan `php artisan test`, dan seluruh test yang disiapkan berhasil dijalankan. Test ini mencakup operasi CRUD serta validasi required field. Hasil tersebut membuktikan bahwa logic aplikasi memiliki perlindungan dasar terhadap perubahan yang tidak diinginkan. Selain itu, pengujian container juga dilakukan dengan menjalankan `docker compose up -d --build` dan memeriksa status container menggunakan `docker compose ps`. Hasilnya menunjukkan bahwa container aplikasi dan database dapat berjalan dengan status healthy.
+
+Pengujian persistent volume dilakukan dengan menyimpan data pada volume database, kemudian menghentikan dan menjalankan kembali stack Docker Compose. Data yang tersimpan tetap tersedia setelah container dibuat ulang, sehingga membuktikan bahwa volume bekerja sesuai tujuan. Simulasi ketahanan layanan juga dilakukan melalui health check dan restart policy, sehingga bila layanan mengalami gangguan dapat dipantau dan dipulihkan. Dari hasil pengujian ini dapat disimpulkan bahwa sistem sudah memenuhi kebutuhan teknis yang diminta pada UAS.
+
+BAB 7 KESIMPULAN
+Berdasarkan hasil pengerjaan proyek, aplikasi Todo List berhasil diterapkan dalam arsitektur multi-container menggunakan Docker dan Docker Compose. Container aplikasi dan container database berjalan secara terpisah, namun tetap saling terhubung melalui network internal. Data aplikasi juga dapat dipertahankan dengan volume sehingga tidak hilang ketika container dihentikan. Hal ini menunjukkan bahwa konsep dasar cloud computing, khususnya containerization, orchestration, dan persistence, telah diterapkan dengan baik pada proyek ini.
+
+Selain itu, pipeline GitHub Actions berhasil digunakan untuk menjalankan testing dan build secara otomatis. Automated testing membantu memastikan bahwa fungsi aplikasi tetap berjalan sebelum image dibangun dan stack dijalankan. Health check juga memberikan mekanisme untuk memantau kondisi layanan, sedangkan restart policy membantu meningkatkan ketahanan layanan. Dengan demikian, proyek ini tidak hanya menghasilkan aplikasi Todo List sederhana, tetapi juga menunjukkan pemahaman terhadap alur kerja pengembangan dan deployment modern.
+
+Untuk pengembangan selanjutnya, aplikasi ini masih dapat diperluas dengan menambahkan service tambahan seperti Redis, Nginx, atau phpMyAdmin. Selain itu, database dapat dibackup secara otomatis atau image dapat dipublikasikan ke Docker Hub atau GitHub Container Registry. Jika dipindahkan ke lingkungan cloud, konfigurasi dapat disesuaikan dengan VPS atau layanan cloud lain tanpa perlu mengubah struktur aplikasi secara signifikan. Dengan fondasi yang sudah dibangun, proyek ini cukup siap untuk dikembangkan ke arah deployment yang lebih profesional.
+
+LAMPIRAN YANG PERLU DITAMBAHKAN
+1. Screenshot `docker --version`
+2. Screenshot `docker compose version`
+3. Screenshot `docker compose up -d --build`
+4. Screenshot `docker compose ps`
+5. Screenshot `php artisan test`
+6. Screenshot `curl http://localhost:8080/api/health`
+7. Screenshot `curl http://localhost:8080/api/todos`
+8. Screenshot workflow GitHub Actions gagal
+9. Screenshot workflow GitHub Actions berhasil
+10. Diagram arsitektur aplikasi
+11. Bukti data persisten setelah `docker compose down` lalu `up -d`
+

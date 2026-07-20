@@ -1,0 +1,87 @@
+<svg viewBox="0 0 1000 620" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="620" fill="#ffffff"/>
+
+  <text x="500" y="34" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">
+    Arsitektur Todo List Application (Docker + Compose + CI/CD)
+  </text>
+
+  <!-- User -->
+  <rect x="40" y="90" width="160" height="70" rx="10" fill="#e0f2fe" stroke="#0369a1" stroke-width="2"/>
+  <text x="120" y="120" text-anchor="middle" font-size="14" font-weight="600" fill="#0c4a6e">Pengguna</text>
+  <text x="120" y="140" text-anchor="middle" font-size="12" fill="#0c4a6e">Browser / curl / Postman</text>
+
+  <!-- Host / Docker Compose boundary -->
+  <rect x="260" y="70" width="620" height="330" rx="14" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="280" y="95" font-size="13" font-weight="600" fill="#475569">Komputer Pribadi &#8212; Docker Compose (network: todo-network)</text>
+
+  <!-- App container -->
+  <rect x="300" y="130" width="230" height="120" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+  <text x="415" y="155" text-anchor="middle" font-size="14" font-weight="700" fill="#14532d">Container: app</text>
+  <text x="415" y="175" text-anchor="middle" font-size="12" fill="#14532d">Laravel 13 + PHP 8.3</text>
+  <text x="415" y="192" text-anchor="middle" font-size="12" fill="#14532d">Port 8080 &#8594; 8000</text>
+  <text x="415" y="209" text-anchor="middle" font-size="12" fill="#14532d">Healthcheck: /api/health</text>
+  <text x="415" y="226" text-anchor="middle" font-size="12" fill="#14532d">restart: unless-stopped</text>
+
+  <!-- DB container -->
+  <rect x="600" y="130" width="230" height="120" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
+  <text x="715" y="155" text-anchor="middle" font-size="14" font-weight="700" fill="#713f12">Container: db</text>
+  <text x="715" y="175" text-anchor="middle" font-size="12" fill="#713f12">MariaDB 11.4</text>
+  <text x="715" y="192" text-anchor="middle" font-size="12" fill="#713f12">Port 3306 (internal)</text>
+  <text x="715" y="209" text-anchor="middle" font-size="12" fill="#713f12">Healthcheck: SELECT 1</text>
+  <text x="715" y="226" text-anchor="middle" font-size="12" fill="#713f12">restart: unless-stopped</text>
+
+  <!-- Volume -->
+  <rect x="640" y="290" width="150" height="60" rx="8" fill="#ede9fe" stroke="#6d28d9" stroke-width="2"/>
+  <text x="715" y="315" text-anchor="middle" font-size="13" font-weight="600" fill="#4c1d95">Volume</text>
+  <text x="715" y="333" text-anchor="middle" font-size="12" fill="#4c1d95">db_data</text>
+
+  <!-- app <-> db arrow -->
+  <line x1="530" y1="190" x2="600" y2="190" stroke="#334155" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="565" y="180" text-anchor="middle" font-size="11" fill="#334155">DB_HOST=db :3306</text>
+
+  <!-- db <-> volume arrow -->
+  <line x1="715" y1="250" x2="715" y2="290" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- user -> app arrow -->
+  <line x1="200" y1="125" x2="300" y2="180" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="245" y="145" text-anchor="middle" font-size="11" fill="#334155">HTTP :8080</text>
+
+  <!-- CI/CD box -->
+  <rect x="300" y="420" width="530" height="150" rx="12" fill="#ffe4e6" stroke="#be123c" stroke-width="2"/>
+  <text x="565" y="445" text-anchor="middle" font-size="14" font-weight="700" fill="#881337">GitHub Actions &#8212; CI/CD Pipeline</text>
+
+  <g font-size="12" fill="#881337">
+    <rect x="320" y="460" width="100" height="40" rx="6" fill="#fecdd3" stroke="#be123c"/>
+    <text x="370" y="484" text-anchor="middle">Checkout</text>
+
+    <rect x="440" y="460" width="100" height="40" rx="6" fill="#fecdd3" stroke="#be123c"/>
+    <text x="490" y="484" text-anchor="middle">Install deps</text>
+
+    <rect x="560" y="460" width="100" height="40" rx="6" fill="#fecdd3" stroke="#be123c"/>
+    <text x="610" y="484" text-anchor="middle">PHPUnit test</text>
+
+    <rect x="680" y="460" width="120" height="40" rx="6" fill="#fecdd3" stroke="#be123c"/>
+    <text x="740" y="484" text-anchor="middle">Docker build</text>
+
+    <line x1="420" y1="480" x2="440" y2="480" stroke="#881337" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="540" y1="480" x2="560" y2="480" stroke="#881337" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="660" y1="480" x2="680" y2="480" stroke="#881337" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="440" y="520" width="240" height="36" rx="6" fill="#fecdd3" stroke="#be123c"/>
+    <text x="560" y="543" text-anchor="middle">compose up -d --build &#8594; verifikasi health check</text>
+    <line x1="740" y1="500" x2="600" y2="520" stroke="#881337" stroke-width="2" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- CI/CD to app image relation -->
+  <line x1="490" y1="420" x2="415" y2="250" stroke="#be123c" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <text x="470" y="345" text-anchor="middle" font-size="11" fill="#881337">build &amp; verifikasi image</text>
+
+  <!-- Legend -->
+  <text x="40" y="600" font-size="11" fill="#64748b">Sumber: docker-compose.yml &amp; .github/workflows/ci.yml &#8212; Todo List Application (Purna Siswantomo &amp; Erifa Dwi Astuti)</text>
+</svg>

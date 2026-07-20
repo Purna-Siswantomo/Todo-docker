@@ -35,6 +35,14 @@ todo-app/
 ├── Dockerfile                               # Docker image definition
 ├── docker-compose.yml                       # Docker Compose configuration
 ├── .github/workflows/ci.yml                 # GitHub Actions workflow
+├── docs/
+│   ├── architecture-diagram.svg             # Diagram arsitektur (vektor)
+│   ├── architecture-diagram.png             # Diagram arsitektur (raster, untuk laporan/slide)
+│   ├── build_report.py                      # Script pembangkit laporan UAS (.docx/.pdf)
+│   └── build_slides.cjs                     # Script pembangkit presentasi UAS (.pptx)
+├── evidence/                                # Bukti eksekusi mentah (docker version, test, health check, dst.)
+├── C2C023160_PurnaSiswantomo_UAS_CloudComputing.pdf   # Laporan UAS (10-15 halaman)
+├── C2C023160_PurnaSiswantomo_UAS_Presentasi.pptx      # Presentasi UAS (maks. 8 slide)
 └── README.md
 ```
 
@@ -96,7 +104,9 @@ php artisan test
 - `test_can_show_todo` - Menguji detail todo
 - `test_can_update_todo` - Menguji update todo
 - `test_can_delete_todo` - Menguji penghapusan todo
-- `test_validates_title_required` - Validasi field title wajib diisi
+- `test_validates_required_title` - Validasi field title wajib diisi
+
+> Catatan: jalankan test pada container sekali pakai yang terpisah dari database produksi (lihat `evidence/03_php_artisan_test.txt`), bukan dengan `docker compose exec app php artisan test` pada container yang sedang berjalan — cara itu memakai database MariaDB produksi dan berisiko mencampur data uji dengan data nyata.
 
 ## 🐳 Docker Configuration
 
@@ -151,17 +161,19 @@ Workflow `.github/workflows/ci.yml` melakukan:
 - Link repository GitHub: https://github.com/Purna-Siswantomo/Todo-docker.git
 - Link pipeline gagal: https://github.com/Purna-Siswantomo/Todo-docker/actions/runs/28741426116
 - Link pipeline berhasil: https://github.com/Purna-Siswantomo/Todo-docker/actions/runs/28741450472
-- Link video demonstrasi: [belum tersedia]
+- Link video demonstrasi: [belum tersedia, direkam sesuai naskah di `script_video_demo_uas_natural.txt`]
 - Link image registry (opsional): [belum tersedia]
 - Link aplikasi online (opsional): [belum tersedia]
+- Nama file laporan: `C2C023160_PurnaSiswantomo_UAS_CloudComputing.pdf`
+- File presentasi: `C2C023160_PurnaSiswantomo_UAS_Presentasi.pptx`
 
-### Bukti UAS yang perlu disertakan
-- Link workflow GitHub Actions yang gagal
-- Link workflow GitHub Actions yang berhasil
-- Screenshot `docker compose ps`
-- Bukti data tetap ada setelah `docker compose down` lalu `docker compose up -d`
-- Bukti `php artisan test` berjalan minimal 3 test
-- Bukti health check dan simulasi restart atau stop container
+### Bukti UAS yang sudah disertakan
+- Link workflow GitHub Actions yang gagal dan yang berhasil (lihat di atas)
+- `evidence/01_docker_version_and_ps.txt` - `docker --version`, `docker compose version`, `docker compose ps`
+- `evidence/02_stack_running_and_health.txt`, `03_php_artisan_test.txt` - stack sehat dan 8 automated test lulus
+- `evidence/04-06_*.txt` - bukti data tetap ada setelah `docker compose down` lalu `up -d` kembali
+- `evidence/07-08_*.txt` - simulasi database mati (health check → 503) dan pulih kembali (→ 200)
+- Detail lengkap serta analisis tiap bukti ada di Bab 6 laporan PDF
 
 ## 📡 API Endpoints
 
@@ -204,8 +216,7 @@ Tugas ini memenuhi praktikum:
 
 ## 👨‍🎓 Identitas Mahasiswa
 
-- **Nama**: Purna Siswantomo
-- **NIM**: [NIM Anda]
+- **Nama**: Purna Siswantomo (C2C023160) & Erifa Dwi Astuti (C2C023161)
 - **Kelas**: [Kelas Anda]
 - **Mata Kuliah**: Komputasi Awan (Cloud Computing)
 - **Pertemuan**: 14

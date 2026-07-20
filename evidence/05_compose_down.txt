@@ -1,0 +1,5 @@
+=== docker compose down (tanpa -v, volume db_data tetap ada) ===
+
+=== docker volume ls | grep db_data ===
+local     faris_db_data
+local     todo-app_db_data

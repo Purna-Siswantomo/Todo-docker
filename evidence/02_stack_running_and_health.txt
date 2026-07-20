@@ -1,0 +1,10 @@
+=== docker compose ps (setelah up -d --build) ===
+NAME       IMAGE          COMMAND                  SERVICE   CREATED         STATUS                   PORTS
+todo-app   todo-app-app   "docker-php-entrypoi…"   app       6 minutes ago   Up 6 minutes (healthy)   0.0.0.0:8081->8000/tcp, [::]:8081->8000/tcp
+todo-db    mariadb:11.4   "docker-entrypoint.s…"   db        6 minutes ago   Up 6 minutes (healthy)   3306/tcp
+
+=== curl http://localhost:8081/api/health ===
+{"status":"healthy"}
+
+=== curl http://localhost:8081/api/todos (sebelum tambah data baru) ===
+[{"id":1,"title":"w","description":"web php","completed":false,"created_at":"2026-07-18T09:38:28.000000Z","updated_at":"2026-07-18T09:38:28.000000Z"}]

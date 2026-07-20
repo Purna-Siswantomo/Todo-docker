@@ -1,0 +1,5 @@
+=== Menambahkan data baru sebelum uji persistent volume ===
+{"title":"Bukti persistent volume UAS","description":"Ditambahkan sebelum docker compose down","updated_at":"2026-07-20T19:00:35.000000Z","created_at":"2026-07-20T19:00:35.000000Z","id":9}
+
+=== Data lengkap sebelum down ===
+[{"id":9,"title":"Bukti persistent volume UAS","description":"Ditambahkan sebelum docker compose down","completed":false,"created_at":"2026-07-20T19:00:35.000000Z","updated_at":"2026-07-20T19:00:35.000000Z"},{"id":1,"title":"w","description":"web php","completed":false,"created_at":"2026-07-18T09:38:28.000000Z","updated_at":"2026-07-18T09:38:28.000000Z"}]

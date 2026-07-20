@@ -1,0 +1,112 @@
+SCRIPT VIDEO DEMONSTRASI UAS
+Proyek: Todo List Application - Laravel + Docker + CI/CD
+Durasi target: 7-10 menit
+
+1. OPENING / IDENTITAS
+Halo, saya Purna Siswantomo dengan NIM C2C023160, bersama Erifa Dwi Astuti dengan NIM C2C023161. Pada video ini kami akan mendemonstrasikan proyek UAS Cloud Computing berupa aplikasi Todo List yang dijalankan menggunakan Docker, Docker Compose, dan GitHub Actions.
+
+2. PENJELASAN SINGKAT PROYEK
+Proyek ini adalah aplikasi Todo List sederhana berbasis Laravel. Fokus utama proyek bukan pada kompleksitas fitur, tetapi pada penerapan konsep cloud computing secara utuh, yaitu containerization, multi-container orchestration, persistent volume, health check, automated testing, dan CI/CD.
+
+3. STRUKTUR REPOSITORY
+Sekarang kami tampilkan struktur repository. Di dalam project terdapat Dockerfile, docker-compose.yml, folder aplikasi Laravel, file .env.example, workflow GitHub Actions, serta file pengujian otomatis.
+
+4. PENJELASAN ARSITEKTUR
+Arsitektur aplikasi terdiri dari dua service utama. Service pertama adalah app untuk menjalankan Laravel, dan service kedua adalah db menggunakan MariaDB. Keduanya dihubungkan melalui network Docker. Data database disimpan pada volume db_data agar tetap aman walaupun container dihentikan dan dijalankan ulang.
+
+5. CEK VERSI DOCKER
+Selanjutnya kami tampilkan versi Docker.
+Jalankan:
+docker --version
+
+Setelah itu tampilkan versi Docker Compose.
+Jalankan:
+docker compose version
+
+6. BUILD DAN RUN CONTAINER
+Sekarang kami build dan menjalankan seluruh service menggunakan Docker Compose.
+Jalankan:
+docker compose up -d --build
+
+Jelaskan bahwa proses ini akan membuat image aplikasi, menjalankan container database, lalu menjalankan container aplikasi setelah database siap.
+
+7. CEK STATUS SERVICE
+Sekarang kami cek status container.
+Jalankan:
+docker compose ps
+
+Tunjukkan bahwa service app dan db sudah berjalan. Idealnya status keduanya healthy.
+
+8. UJI APLIKASI
+Sekarang kami buka aplikasi di browser pada port 8080 atau melalui endpoint API.
+Tampilkan halaman atau jalankan:
+curl http://localhost:8080/api/todos
+
+Jelaskan bahwa endpoint ini mengambil data todo dari database container.
+
+9. TAMBAH DATA
+Sekarang kami tambahkan data todo baru untuk membuktikan aplikasi bisa melakukan operasi create dan terhubung ke database.
+Gunakan form atau request POST ke endpoint /api/todos.
+
+Setelah itu tampilkan kembali daftar data todo untuk membuktikan data tersimpan.
+
+10. HEALTH CHECK
+Sekarang kami cek health endpoint.
+Jalankan:
+curl http://localhost:8080/api/health
+
+Jelaskan bahwa endpoint ini digunakan untuk memastikan aplikasi masih sehat dan koneksi ke database berjalan.
+
+11. PERSISTENT VOLUME
+Sekarang kami akan membuktikan data tetap ada setelah container dihentikan.
+Jalankan:
+docker compose down
+
+Setelah itu jalankan lagi:
+docker compose up -d
+
+Kemudian buka kembali aplikasi atau endpoint /api/todos.
+Jelaskan bahwa data masih ada karena database disimpan di volume db_data.
+
+12. AUTOMATED TESTING LOKAL
+Sekarang kami jalankan automated testing secara lokal.
+Jalankan:
+php artisan test
+
+Jelaskan bahwa test ini mencakup listing todo, create todo, show todo, update todo, delete todo, dan validasi required title.
+
+13. PIPELINE GAGAL DAN BERHASIL
+Selanjutnya kami tunjukkan bukti pipeline GitHub Actions yang gagal dan berhasil.
+Tampilkan link workflow gagal:
+https://github.com/Purna-Siswantomo/Todo-docker/actions/runs/28741426116
+
+Tampilkan link workflow berhasil:
+https://github.com/Purna-Siswantomo/Todo-docker/actions/runs/28741450472
+
+Jelaskan bahwa pipeline gagal disimulasikan secara terkontrol, lalu diperbaiki hingga pipeline berhasil.
+
+14. PENJELASAN FILE PENTING
+Jelaskan singkat fungsi file-file inti:
+- Dockerfile untuk membangun image aplikasi
+- docker-compose.yml untuk menjalankan multi-container
+- .env.example untuk konfigurasi environment
+- .github/workflows/ci.yml untuk CI/CD
+- docker/entrypoint.sh untuk menunggu database dan menjalankan migrasi saat container start
+
+15. PENJELASAN KETAHANAN LAYANAN
+Jelaskan bahwa health check dan restart policy membantu layanan tetap stabil. Jika salah satu service bermasalah, statusnya bisa dipantau dan container dapat dipulihkan dengan lebih cepat.
+
+16. PENUTUP
+Sebagai kesimpulan, proyek ini berhasil menerapkan aplikasi multi-container dengan Docker Compose, persistent volume, health check, automated testing, dan GitHub Actions. Terima kasih.
+
+CATATAN PENGAMBILAN VIDEO
+1. Pastikan terlihat identitas mahasiswa.
+2. Tampilkan struktur repository.
+3. Tampilkan output docker --version dan docker compose version.
+4. Tampilkan docker compose up -d --build dan docker compose ps.
+5. Tampilkan aplikasi berjalan, tambah data, dan cek data.
+6. Tampilkan bukti data tetap ada setelah docker compose down lalu up -d.
+7. Tampilkan php artisan test.
+8. Tampilkan workflow gagal dan berhasil.
+9. Tampilkan health check dan penjelasan arsitektur.
+

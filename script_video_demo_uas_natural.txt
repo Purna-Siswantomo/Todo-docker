@@ -1,0 +1,99 @@
+SCRIPT VIDEO DEMONSTRASI UAS - VERSI NATURAL
+
+Halo, perkenalkan saya Purna Siswantomo dengan NIM C2C023160, bersama Erifa Dwi Astuti dengan NIM C2C023161.
+Pada video ini kami akan mendemonstrasikan proyek UAS Cloud Computing berupa aplikasi Todo List yang dijalankan dengan Docker, Docker Compose, dan GitHub Actions.
+
+Proyek ini kami buat untuk menunjukkan penerapan konsep cloud computing secara utuh.
+Fokusnya bukan pada kompleksitas aplikasi, tetapi pada bagaimana aplikasi dikemas ke dalam container, dijalankan sebagai multi-container, dipantau dengan health check, diuji secara otomatis, dan diintegrasikan ke pipeline CI/CD.
+
+Sekarang kami tampilkan struktur repository.
+Di dalam repository ini terdapat Dockerfile, docker-compose.yml, folder aplikasi Laravel, file .env.example, workflow GitHub Actions, serta file automated testing.
+Struktur ini menunjukkan bahwa project sudah disiapkan untuk dijalankan dan diuji secara terintegrasi.
+
+Secara arsitektur, aplikasi ini terdiri dari dua service utama.
+Service pertama adalah `app`, yaitu container Laravel yang menangani request dari pengguna.
+Service kedua adalah `db`, yaitu container MariaDB yang menyimpan data todo.
+Kedua service dihubungkan melalui network Docker, dan data database disimpan pada volume `db_data` agar tidak hilang ketika container dihentikan atau dijalankan ulang.
+
+Sekarang kami cek versi Docker terlebih dahulu.
+Perintah yang dijalankan adalah `docker --version`.
+
+Selanjutnya kami cek versi Docker Compose.
+Perintah yang dijalankan adalah `docker compose version`.
+
+Setelah itu kami akan menjalankan seluruh stack menggunakan Docker Compose.
+Perintah yang digunakan adalah `docker compose up -d --build`.
+
+Pada tahap ini Docker akan membangun image aplikasi, menjalankan container database terlebih dahulu, lalu menjalankan container aplikasi setelah database siap.
+Ini adalah bagian penting dari arsitektur multi-container karena aplikasi dan database tidak lagi dijalankan dalam satu container yang sama.
+
+Sekarang kami cek status service yang berjalan.
+Perintah yang digunakan adalah `docker compose ps`.
+Di sini dapat dilihat bahwa service `app` dan `db` sudah aktif.
+Jika statusnya healthy, berarti container sudah siap digunakan.
+
+Berikutnya kami buka aplikasi melalui browser pada port 8080 atau menggunakan endpoint API.
+Kami juga bisa memanggil endpoint `/api/todos` untuk melihat data todo yang tersimpan di database.
+Perintah yang bisa digunakan adalah `curl http://localhost:8080/api/todos`.
+
+Sekarang kami akan menambahkan data todo baru.
+Langkah ini menunjukkan bahwa aplikasi bisa melakukan operasi create dan terhubung dengan database container.
+Setelah data ditambahkan, kami tampilkan kembali daftar todo untuk membuktikan bahwa data berhasil tersimpan.
+
+Selanjutnya kami cek health endpoint.
+Perintah yang dijalankan adalah `curl http://localhost:8080/api/health`.
+Endpoint ini digunakan untuk memastikan aplikasi masih sehat dan koneksi ke database berjalan dengan benar.
+
+Berikutnya kami tunjukkan bukti persistent volume.
+Kami hentikan container dengan `docker compose down`, lalu kami jalankan kembali dengan `docker compose up -d`.
+Setelah itu kami buka kembali data todo.
+Jika data masih muncul, berarti volume database berfungsi dengan benar dan data tidak hilang ketika container direstart.
+
+Sekarang kami jalankan automated testing secara lokal.
+Perintah yang digunakan adalah `php artisan test`.
+Di project ini ada lebih dari tiga test otomatis yang mencakup listing todo, create todo, show todo, update todo, delete todo, dan validasi input.
+Hasil test ini penting karena menunjukkan bahwa fitur utama aplikasi sudah diverifikasi sebelum image dinyatakan layak digunakan.
+
+Selanjutnya kami tunjukkan pipeline GitHub Actions.
+Pertama, kami tampilkan workflow yang gagal sebagai bukti bahwa pipeline benar-benar pernah diuji dalam kondisi error.
+Link workflow gagal adalah:
+https://github.com/Purna-Siswantomo/Todo-docker/actions/runs/28741426116
+
+Kemudian kami tampilkan workflow yang berhasil setelah perbaikan dilakukan.
+Link workflow berhasil adalah:
+https://github.com/Purna-Siswantomo/Todo-docker/actions/runs/28741450472
+
+Ini menunjukkan bahwa pipeline tidak hanya dibuat, tetapi juga digunakan sebagai quality gate.
+Perubahan yang menyebabkan test gagal diperbaiki, lalu pipeline dijalankan ulang sampai berhasil.
+
+Sekarang kami jelaskan file-file penting di project ini secara singkat.
+Dockerfile digunakan untuk membangun image aplikasi.
+docker-compose.yml digunakan untuk menjalankan service `app` dan `db` secara terkoordinasi.
+File `.env.example` digunakan sebagai template konfigurasi environment agar credential tidak ditulis langsung ke repository.
+Workflow `.github/workflows/ci.yml` digunakan untuk menjalankan testing dan build secara otomatis.
+File `docker/entrypoint.sh` digunakan untuk menunggu database siap, menjalankan migrasi, lalu start aplikasi.
+
+Dari sisi ketahanan layanan, health check dan restart policy membantu memastikan service dapat dipantau dan dipulihkan dengan lebih mudah.
+Jika database belum siap, aplikasi menunggu terlebih dahulu.
+Jika salah satu service berhenti, Docker Compose dapat membantu menghidupkannya kembali sesuai konfigurasi yang sudah dibuat.
+
+Sebagai kesimpulan, proyek ini berhasil menerapkan aplikasi multi-container dengan Docker Compose, persistent volume, health check, automated testing, dan GitHub Actions.
+Implementasi ini sudah sesuai dengan kebutuhan UAS Cloud Computing karena menampilkan hubungan antara aplikasi, container, orkestrasi, volume, dan CI/CD secara nyata.
+Terima kasih.
+
+CATATAN SAAT REKAMAN
+1. Tampilkan identitas di awal video.
+2. Tampilkan struktur repository.
+3. Jalankan dan tampilkan `docker --version`.
+4. Jalankan dan tampilkan `docker compose version`.
+5. Jalankan `docker compose up -d --build`.
+6. Tampilkan `docker compose ps`.
+7. Buka aplikasi dan tampilkan data todo.
+8. Tambahkan todo baru lalu cek hasilnya.
+9. Tampilkan `curl http://localhost:8080/api/health`.
+10. Tampilkan `docker compose down` lalu `docker compose up -d`.
+11. Tampilkan data tetap ada.
+12. Jalankan `php artisan test`.
+13. Tampilkan workflow gagal dan berhasil.
+14. Tutup video dengan kesimpulan singkat.
+

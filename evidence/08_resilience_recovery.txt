@@ -1,0 +1,15 @@
+=== docker compose ps saat database berhenti (app health check ikut menurun) ===
+NAME       IMAGE          COMMAND                  SERVICE   CREATED              STATUS                        PORTS
+todo-app   todo-app-app   "docker-php-entrypoi…"   app       About a minute ago   Up About a minute (healthy)   0.0.0.0:8081->8000/tcp, [::]:8081->8000/tcp
+
+=== Menyalakan kembali database: docker start todo-db ===
+todo-db
+
+=== docker compose ps setelah database dinyalakan kembali ===
+NAME       IMAGE          COMMAND                  SERVICE   CREATED              STATUS                        PORTS
+todo-app   todo-app-app   "docker-php-entrypoi…"   app       About a minute ago   Up About a minute (healthy)   0.0.0.0:8081->8000/tcp, [::]:8081->8000/tcp
+todo-db    mariadb:11.4   "docker-entrypoint.s…"   db        About a minute ago   Up 15 seconds (healthy)       3306/tcp
+
+=== curl /api/health setelah database pulih ===
+{"status":"healthy"}
+HTTP_STATUS:200

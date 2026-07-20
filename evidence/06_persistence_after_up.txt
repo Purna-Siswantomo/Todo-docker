@@ -1,0 +1,7 @@
+=== docker compose ps (setelah up -d kembali) ===
+NAME       IMAGE          COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+todo-app   todo-app-app   "docker-php-entrypoi…"   app       14 seconds ago   Up 8 seconds (healthy)    0.0.0.0:8081->8000/tcp, [::]:8081->8000/tcp
+todo-db    mariadb:11.4   "docker-entrypoint.s…"   db        14 seconds ago   Up 14 seconds (healthy)   3306/tcp
+
+=== curl /api/todos (setelah down lalu up kembali) ===
+[{"id":9,"title":"Bukti persistent volume UAS","description":"Ditambahkan sebelum docker compose down","completed":false,"created_at":"2026-07-20T19:00:35.000000Z","updated_at":"2026-07-20T19:00:35.000000Z"},{"id":1,"title":"w","description":"web php","completed":false,"created_at":"2026-07-18T09:38:28.000000Z","updated_at":"2026-07-18T09:38:28.000000Z"}]

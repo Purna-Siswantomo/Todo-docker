@@ -1,0 +1,3 @@
+todo-app-app:latest               0ded50e66198        869MB          222MB   U    
+todo-app:test                     8e150fba5433        817MB          213MB        
+todo-app:v1                       d8514ef1284c        690MB          169MB        

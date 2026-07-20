@@ -1,0 +1,12 @@
+=== Kondisi awal: semua sehat ===
+NAME       IMAGE          COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+todo-app   todo-app-app   "docker-php-entrypoi…"   app       28 seconds ago   Up 22 seconds (healthy)   0.0.0.0:8081->8000/tcp, [::]:8081->8000/tcp
+todo-db    mariadb:11.4   "docker-entrypoint.s…"   db        28 seconds ago   Up 28 seconds (healthy)   3306/tcp
+
+=== Menghentikan container database (docker stop todo-db) untuk simulasi gangguan ===
+todo-db
+
+=== curl /api/health saat database mati ===
+{"status":"unhealthy","error":"SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo for db failed: Name does not resolve"}
+HTTP_STATUS:503
+
