@@ -4,16 +4,16 @@ services:
     container_name: todo-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: todo_app
-      MYSQL_USER: todo_user
-      MYSQL_PASSWORD: todo_password
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
     networks:
       - todo-network
     healthcheck:
-      test: ["CMD-SHELL", "mariadb --protocol=tcp -h 127.0.0.1 -utodo_user -ptodo_password todo_app -e 'SELECT 1' >/dev/null 2>&1"]
+      test: ["CMD-SHELL", "mariadb --protocol=tcp -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD $$MYSQL_DATABASE -e 'SELECT 1' >/dev/null 2>&1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,9 +34,9 @@ services:
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
-      DB_DATABASE: todo_app
-      DB_USERNAME: todo_user
-      DB_PASSWORD: todo_password
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
